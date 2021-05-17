@@ -11,7 +11,7 @@ import (
 
 type Client struct {
 	tgClient       *telegram.Client
-	users          map[int32]*telegram.UserObj
+	Users          map[int32]*telegram.UserObj
 	mux            sync.Mutex
 	IfShortMessage func(message *telegram.UpdateShortMessage)
 	IfNewMessage   func(message *telegram.MessageObj)
@@ -74,7 +74,7 @@ func (c *Client) RunCustomUpdatesHandler() {
 }
 
 func (c *Client) getUsers() error {
-	c.users = make(map[int32]*telegram.UserObj)
+	c.Users = make(map[int32]*telegram.UserObj)
 	chats, err := c.tgClient.ContactsGetContacts(0)
 	if err != nil {
 		return fmt.Errorf("get contacts err: %w", err)
@@ -82,7 +82,7 @@ func (c *Client) getUsers() error {
 	cts, _ := chats.(*telegram.ContactsContactsObj)
 	for _, user := range cts.Users {
 		usr := user.(*telegram.UserObj)
-		c.users[usr.ID] = usr
+		c.Users[usr.ID] = usr
 	}
 	return nil
 }
@@ -97,7 +97,7 @@ func (c *Client) SendMessage(userID int32, message string) {
 }
 
 func (c *Client) sendMessage(userID int32, message string) error {
-	selectedUser, ok := c.users[userID]
+	selectedUser, ok := c.Users[userID]
 	if !ok {
 		return errors.New("user not found")
 	}
@@ -153,7 +153,7 @@ func (c *Client) SendMedia(userID int32) {
 }
 
 func (c *Client) sendMedia(userID int32) error {
-	selectedUser, ok := c.users[userID]
+	selectedUser, ok := c.Users[userID]
 	if !ok {
 		return errors.New("user not found")
 	}
